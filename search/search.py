@@ -90,26 +90,59 @@ def depthFirstSearch(problem):
     print("Start:", problem.getStartState())
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+    # [((5, 4), 'South', 1), ((4, 5), 'West', 1)]
+    # (5,5)
     fringe = util.Stack()
-    close = set()
-    fringe.push((((problem.getStartState(), None, 1),[]),0))
-    while not fringe.isEmpty():
-        node = fringe.pop()
-        
-        if node[0][0][0] not in close:
-            close.add(node[0][0][0])
-            for child in problem.getSuccessors(node[0][0][0]):
-                fringe.push(((child, node[0][1] + [child[1] ]), node[1] + child[2]))
-        if problem.isGoalState(node[0][0][0]):
-            return node[0][1]
-    return None
-    
+    start_pos = problem.getStartState()
+    closed = set()
+    first_node = ((start_pos, '', 1),[]) # [] is the fringe
+    fringe.push(first_node)
 
+    while not fringe.isEmpty():
+        cur_node = fringe.pop()
+        if problem.isGoalState(cur_node[0][0]):
+            print("Find")
+            # print(cur_node[1])
+            return cur_node[1]
+
+        if cur_node[0][0] not in closed:
+            # print(cur_node)
+            closed.add(cur_node[0][0])
+            # print(cur_node[0][0])
+            for succ in problem.getSuccessors(cur_node[0][0]):
+                next_node = (succ,cur_node[1] + [succ[1]])
+                fringe.push(next_node)
+    return None
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    print("Start:", problem.getStartState())
+    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+
+    fringe = util.Queue()
+    start_pos = problem.getStartState()
+    closed = set()
+    first_node = ((start_pos, '', 1),[])
+    fringe.push(first_node)
+
+    while not fringe.isEmpty():
+        cur_node = fringe.pop()
+        if problem.isGoalState(cur_node[0][0]):
+            print("Find")
+            # print(cur_node[1])
+            return cur_node[1]
+
+        if cur_node[0][0] not in closed:
+            # print(cur_node)
+            closed.add(cur_node[0][0])
+            # print(cur_node[0][0])
+            for succ in problem.getSuccessors(cur_node[0][0]):
+                next_node = (succ,cur_node[1] + [succ[1]])
+                fringe.push(next_node)
+    return None
+
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
