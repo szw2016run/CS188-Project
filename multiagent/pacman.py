@@ -353,7 +353,7 @@ class PacmanRules:
 
     def applyAction(state, action):
         """
-        Edits the state to reflect the results of the action.
+        # Edits the state to reflect the results of the action.
         """
         legal = PacmanRules.getLegalActions(state)
         if action not in legal:

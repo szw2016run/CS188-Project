@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -72,9 +72,28 @@ class ReflexAgent(Agent):
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
-
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        # for ele in newGhostStates:
+        #     print(ele)
+        food_list = newFood.asList()
+
+        ghost_distance = manhattanDistance(newGhostStates[0].getPosition(),newPos)
+        food_distance_list = [manhattanDistance(x,newPos) for x in food_list]
+        # return ghost_distance + min_food_distance
+        # print(foodList)
+        # newGhostStates is a list with only one element
+        # The format is like:
+        # Ghost: (x,y)=(12.0, 7.0), East
+        result = successorGameState.getScore()
+
+        if len(food_distance_list):
+            min_food_distance = min(food_distance_list)
+            result = result + 12 / min_food_distance
+
+        if ghost_distance:
+            result = result - 12 / ghost_distance
+        # print("Socre is ", successorGameState.getScore())
+        return result
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -135,7 +154,53 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # This helper function aims to return the agent's action
+        def helper_minimax(gameState, depth, agentIndex):
+
+            # Judge if all the agents have taken action in this tern
+            # if so, increase the depth and initialize the agentIndex
+            if agentIndex == gameState.getNumAgents():
+                depth = depth + 1
+                agentIndex = 0
+
+            # If game end, or reach the limited depth
+            # return the action decided from the evaluationFunction
+            if gameState.isWin() or gameState.isLose() or depth == self.depth:
+                #print(self.evaluationFunction(gameState))
+                return self.evaluationFunction(gameState)
+            # If this agent is *Pacman*, set the success_val to be *-inf*
+            # If a ghost, set the success_val to be *+inf*
+            if agentIndex == 0:
+                decision = [-9999, ""]
+            else:
+                decision = [9999, ""]
+
+            # All the legal actions for current agent
+            actionList = gameState.getLegalActions(agentIndex)
+
+            for action in actionList:
+                successor = gameState.generateSuccessor(agentIndex, action)
+                # print("successor is :")
+                # print(successor)
+                successor_decision = helper_minimax(successor, depth, agentIndex + 1)
+                # print("succ-decision is ", successor_decision)
+
+                if type(successor_decision) is float:
+                    succ_value = successor_decision
+                else:
+                    succ_value = successor_decision[0]
+                # Pacman takes the action that is the best for the score
+                if agentIndex == 0 and succ_value > decision[0]:
+                    decision = [succ_value, action]
+
+                # Ghost takes the action that is the worst for the score
+                if agentIndex != 0 and succ_value < decision[0]:
+                    decision = [succ_value, action]
+            # print(decision)
+            return decision
+
+        return helper_minimax(gameState, 0, 0)[1]
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
@@ -147,7 +212,62 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        alpha = -9999
+        beta = 9999
+        def helper(gameState, depth, agentIndex, alpha, beta):
+
+            # Judge if all the agents have taken action in this tern
+            # if so, increase the depth and initialize the agentIndex
+            if agentIndex == gameState.getNumAgents():
+                depth = depth + 1
+                agentIndex = 0
+
+            # If game end, or reach the limited depth
+            # return the action decided from the evaluationFunction
+            if gameState.isWin() or gameState.isLose() or depth == self.depth:
+                #print(self.evaluationFunction(gameState))
+                return self.evaluationFunction(gameState)
+            # If this agent is *Pacman*, set the success_val to be *-inf*
+            # If a ghost, set the success_val to be *+inf*
+            if agentIndex == 0:
+                decision = [-9999, ""]
+            else:
+                decision = [9999, ""]
+
+            # All the legal actions for current agent
+            actionList = gameState.getLegalActions(agentIndex)
+
+            for action in actionList:
+                successor = gameState.generateSuccessor(agentIndex, action)
+                # print("successor is :")
+                # print(successor)
+                successor_decision = helper(successor, depth, agentIndex + 1, alpha, beta)
+                # print("succ-decision is ", successor_decision)
+
+                if type(successor_decision) is float:
+                    succ_value = successor_decision
+                else:
+                    succ_value = successor_decision[0]
+                # Pacman takes the action that is the best for the score
+                if agentIndex == 0:
+                    if succ_value > decision[0]:
+                        decision = [succ_value, action]
+                    if succ_value > beta:
+                        return decision
+                    alpha = max(succ_value, alpha)
+
+                # Ghost takes the action that is the worst for the score
+                if agentIndex != 0:
+                    if succ_value < decision[0]:
+                        decision = [succ_value, action]
+                    if succ_value < alpha:
+                        return decision
+                    beta = min(succ_value, beta)
+            # print(decision)
+            return decision
+
+        return helper(gameState, 0, 0, alpha,beta)[1]
+
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
