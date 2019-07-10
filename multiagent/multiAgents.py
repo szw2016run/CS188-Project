@@ -214,7 +214,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         "*** YOUR CODE HERE ***"
         alpha = -9999
         beta = 9999
-        def helper(gameState, depth, agentIndex, alpha, beta):
+        def helper_alphabeta(gameState, depth, agentIndex, alpha, beta):
 
             # Judge if all the agents have taken action in this tern
             # if so, increase the depth and initialize the agentIndex
@@ -241,7 +241,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 successor = gameState.generateSuccessor(agentIndex, action)
                 # print("successor is :")
                 # print(successor)
-                successor_decision = helper(successor, depth, agentIndex + 1, alpha, beta)
+                successor_decision = helper_alphabeta(successor, depth, agentIndex + 1, alpha, beta)
                 # print("succ-decision is ", successor_decision)
 
                 if type(successor_decision) is float:
@@ -266,7 +266,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             # print(decision)
             return decision
 
-        return helper(gameState, 0, 0, alpha,beta)[1]
+        return helper_alphabeta(gameState, 0, 0, alpha,beta)[1]
 
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
@@ -282,7 +282,52 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # This helper function aims to return the agent's action
+        def helper_epx(gameState, depth, agentIndex):
+
+            # Judge if all the agents have taken action in this tern
+            # if so, increase the depth and initialize the agentIndex
+            if agentIndex == gameState.getNumAgents():
+                depth = depth + 1
+                agentIndex = 0
+
+            # If game end, or reach the limited depth
+            # return the action decided from the evaluationFunction
+            if gameState.isWin() or gameState.isLose() or depth == self.depth:
+                #print(self.evaluationFunction(gameState))
+                return self.evaluationFunction(gameState)
+            # If this agent is *Pacman*, set the success_val to be *-inf*
+            # If a ghost, set the success_val to be *+inf*
+            if agentIndex == 0:
+                decision = [-9999, ""]
+            else:
+                decision = [0, ""]
+
+            # All the legal actions for current agent
+            actionList = gameState.getLegalActions(agentIndex)
+
+            for action in actionList:
+                successor = gameState.generateSuccessor(agentIndex, action)
+                # print("successor is :")
+                # print(successor)
+                successor_decision = helper_epx(successor, depth, agentIndex + 1)
+                # print("succ-decision is ", successor_decision)
+
+                if type(successor_decision) is float:
+                    succ_value = successor_decision
+                else:
+                    succ_value = successor_decision[0]
+                # Pacman takes the action that is the best for the score
+                if agentIndex == 0 and succ_value > decision[0]:
+                    decision = [succ_value, action]
+
+                # Ghost takes the action that is the average of all succ_values
+                if agentIndex != 0:
+                    decision = [succ_value / len(actionList) + decision[0], action]
+            # print(decision)
+            return decision
+
+        return helper_epx(gameState, 0, 0)[1]
 
 def betterEvaluationFunction(currentGameState):
     """
