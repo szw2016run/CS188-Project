@@ -335,9 +335,37 @@ def betterEvaluationFunction(currentGameState):
     evaluation function (question 5).
 
     DESCRIPTION: <write something here so we know what you did>
+    Idea1: use reflex
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # successorGameState = currentGameState.generatePacmanSuccessor(action)
+    curPos = currentGameState.getPacmanPosition()
+    curFood = currentGameState.getFood()
+    curGhostStates = currentGameState.getGhostStates()
+
+    numFood = currentGameState.getNumFood()
+
+    food_list = curFood.asList()
+
+    food_distance_list = [manhattanDistance(x, curPos) for x in food_list]
+
+    if len(food_distance_list):
+        min_food_distance = min(food_distance_list)
+    else:
+        min_food_distance = 0
+
+    result = currentGameState.getScore()
+
+    ghostFeature = 0
+
+    for ghost in currentGameState.getGhostStates():
+
+        curGhostDist = util.manhattanDistance(ghost.getPosition(), curPos)
+
+        if ghost.scaredTimer > curGhostDist:
+            ghostFeature = ghostFeature - curGhostDist + 150
+
+    return result - min_food_distance - 10 * numFood + ghostFeature
 
 # Abbreviation
 better = betterEvaluationFunction
