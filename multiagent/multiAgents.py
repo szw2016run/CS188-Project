@@ -73,8 +73,6 @@ class ReflexAgent(Agent):
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
         "*** YOUR CODE HERE ***"
-        # for ele in newGhostStates:
-        #     print(ele)
         food_list = newFood.asList()
 
         ghost_distance = manhattanDistance(newGhostStates[0].getPosition(),newPos)
@@ -88,7 +86,7 @@ class ReflexAgent(Agent):
 
         if len(food_distance_list):
             min_food_distance = min(food_distance_list)
-            result = result + 12 / min_food_distance
+            result = result + 12 /min_food_distance
 
         if ghost_distance:
             result = result - 12 / ghost_distance
@@ -157,7 +155,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # This helper function aims to return the agent's action
         def helper_minimax(gameState, depth, agentIndex):
 
-            # Judge if all the agents have taken action in this tern
+            # Judge if all the agents have taken action in this turn
             # if so, increase the depth and initialize the agentIndex
             if agentIndex == gameState.getNumAgents():
                 depth = depth + 1
@@ -189,6 +187,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
                     succ_value = successor_decision
                 else:
                     succ_value = successor_decision[0]
+
+
                 # Pacman takes the action that is the best for the score
                 if agentIndex == 0 and succ_value > decision[0]:
                     decision = [succ_value, action]
