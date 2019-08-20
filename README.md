@@ -10,3 +10,4 @@ Gonna leave UC Berkeley in 1 week and leave states in 2 weeks.
 
 Hope all well. God bless me.
 
+# Note: Make the repo public at Aug 20, 2019
